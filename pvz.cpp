@@ -11,6 +11,8 @@ using namespace std;
 
 MTRand_int32 mtrand;
 
+void loadEntry(){}
+
 void init(){
 	struct timeval tim;  
 	gettimeofday(&tim, NULL);
