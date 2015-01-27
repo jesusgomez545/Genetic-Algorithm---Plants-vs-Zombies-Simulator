@@ -1,6 +1,12 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#define MAX_ELEMENT_TYPE 4;
+extern const int MAX_FILAS = 4;
+extern const int MAX_VIDA_ZOMBIE = 4;
+extern const int MAX_VIDA_PLANTA = 1;
+extern const int MAX_PASO_ZOMBIE = 1;
+extern const int MAX_ELEMENT_TYPE = 4;
+extern const int INDIVIDUOS_POR_POBLACION = 100;
+
 
 #endif // CONSTANTS_H
