@@ -17,6 +17,10 @@ void init(){
 	mtrand.seed(1000000 * tim.tv_sec + tim.tv_usec);
 }
 
+
+void cruce(){}
+
+
 char toSingleChar(int g){
 	return (char)(((int)'0')+g);
 }
