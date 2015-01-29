@@ -17,16 +17,14 @@ void init(){
 	mtrand.seed(1000000 * tim.tv_sec + tim.tv_usec);
 }
 
-
-void printmatrix(string x, int f, int c){
-	for(int i=0; i<f; i++){
+void printMatrix(string x, int r, int c){
+	for(int i=0; i<r; i++){
 		for(int j=0; j<c; j++){
 			cout<<" "<<x[i*c+j];
 		}
-	cout<<endl;
+		cout<<endl;
 	}
 }
-
 
 char toSingleChar(int g){
 	return (char)(((int)'0')+g);
@@ -60,7 +58,7 @@ int main(){
 	    cout << '\t' << *it;
 	cout << '\n';
 
-	printmatrix(init_pob[0],4,2);
+	printMatrix(init_pob[0],4,2);
 	cout<< init_pob.size() <<endl;
 
 	return EXIT_SUCCESS;
