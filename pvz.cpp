@@ -71,6 +71,12 @@ bool compara_aptitud(result_set lhs, result_set rhs){
 	return  ai_r > ai_l;
 }
 
+bool compara_aptitud_absolute(result_set lhs, result_set rhs){ 
+	float ai_l = ((float)lhs.plantas / lhs.turnos);
+	float ai_r = ((float)rhs.plantas / rhs.turnos);
+	return  ai_r > ai_l;
+}
+
 void loadEntry(
 	int &w, 
 	int &h, 
@@ -167,10 +173,12 @@ vector<result_set> generarPoblacion(int h){
 }
 
 
-set<int> getNrandDistinct(int n, int max){
+set<int> getNrandDistinct(int n, int max, string caller){
 	
+
 	if ( n >= max ){
-		cout << "(!) Se generaran todas las posiciones disponibles [0-"<<max<<"]"<<endl;
+		//cout << "(!) Se generaran todas las posiciones disponibles [0-"<<max-1<<"]"<<endl;
+		//cout<<n<<" "<<max<<endl;
 		n = max;
 	}
 	
@@ -180,7 +188,7 @@ set<int> getNrandDistinct(int n, int max){
 		p = n>= max ? p : mtrand() % max;
 		s.insert(p < 0 ? -1 * p : p);
 		++p;
-	}
+	}	
 	return s;
 }
 
@@ -313,7 +321,8 @@ void seleccion_torneo(
 	
 	for (it=individuos.begin(); it!=individuos.end(); ++it)
 	{
-		poblacion[*it] = aptitud((poblacion[*it]).individuo,zv, w, h, z);
+		
+		poblacion[*it] = aptitud((poblacion[*it]).individuo,zv, w, h, z);		
 
 		if ((float)poblacion[*it].plantas / poblacion[*it].turnos > max_aptitup)
 		{
@@ -321,7 +330,6 @@ void seleccion_torneo(
 			pos_final = *it;
 		}
 	}	
-	
 	poblacion_nueva.push_back(poblacion[pos_final]);
 	poblacion.erase(poblacion.begin()+pos_final);	
 }
@@ -330,58 +338,65 @@ void cruce_clasico(
 	vector<result_set> &poblacion,
 	vector<Zombie> zv, int w, int h, int z
 	){ 
-	
-	int crossing = 2 * ( ( mtrand() % (poblacion.size()/2)) + 1 );
+	if(poblacion.size() > 1){
+		int crossing = 2 * ( ( mtrand() % (poblacion.size()/2)) + 1 );
+		set<int> m = getNrandDistinct(crossing, poblacion.size(), "cc");
+		char plant;
+		int pos_cruce;
+		result_set r;
+		string i1, i2;
+		set<int>::iterator it=m.begin();
+		r.sobrevive = false;
+		r.plantas = 0;
+		r.turnos = 1;
 
-	set<int> m = getNrandDistinct(crossing, poblacion.size());
-	char plant;
-	int pos_cruce;
-	result_set r;
-	string i1, i2;
-	set<int>::iterator it=m.begin();
-	r.sobrevive = false;
-	r.plantas = 0;
-	r.turnos = 1;
-
-	while( it!= m.end() )
-	{
-		i1 = poblacion[*it].individuo;
-		advance(it,1);
-		i2 = poblacion[*it].individuo;
-		advance(it,1);
-
-		if( mtrand_closed() <= FACTOR_CRUCE )
-		{	
-			pos_cruce = 0;
-
-			while ( pos_cruce ==  0 || pos_cruce == MAX_COLUMNAS-1 ){
-				pos_cruce = mtrand() % MAX_COLUMNAS;
-			}
-
-			for(int i = 0; i < w; ++i)
-				for (int j = pos_cruce; j< MAX_COLUMNAS; ++j){
-					plant = i1[ i* MAX_COLUMNAS + j ];
-					i1[ i* MAX_COLUMNAS + j ] = i2[ i* MAX_COLUMNAS + j ];;
-					i2[ i* MAX_COLUMNAS + j ] = plant;
-				}
+		while( it!= m.end() )
+		{		
+			i1 = poblacion[*it].individuo;
+			if(it!=m.end())
+				advance(it,1);
+			else
+				break;		
+			i2 = poblacion[*it].individuo;
 			
-			r.individuo = i1;
-			r = aptitud(r.individuo, zv, w, h, z);
-			poblacion.push_back(r);
+			if(it!=m.end())
+				advance(it,1);
+			else
+				break;
 
-			r.individuo = i2;
-			r = aptitud(r.individuo, zv, w, h, z);
-			poblacion.push_back(r);
-		}		
-	}
+			if( mtrand_closed() <= FACTOR_CRUCE )
+			{	
+				pos_cruce = 0;
+
+				while ( pos_cruce ==  0 || pos_cruce == MAX_COLUMNAS-1 ){
+					pos_cruce = mtrand() % MAX_COLUMNAS;
+				}		
+
+				for(int i = 0; i < w; ++i)
+					for (int j = pos_cruce; j< MAX_COLUMNAS; ++j){
+						plant = i1[ i* MAX_COLUMNAS + j ];
+						i1[ i* MAX_COLUMNAS + j ] = i2[ i* MAX_COLUMNAS + j ];;
+						i2[ i* MAX_COLUMNAS + j ] = plant;
+					}
+				
+				r.individuo = i1;
+				r = aptitud(r.individuo, zv, w, h, z);
+				poblacion.push_back(r);
+
+				r.individuo = i2;
+				r = aptitud(r.individuo, zv, w, h, z);
+				poblacion.push_back(r);			
+			}	
+		}
+	}	
 }
 
 void mutacion_clasica(
 	vector<result_set> &poblacion,
 	vector<Zombie> zv, int w, int h, int z
-	){
-	int mutating = (mtrand() % (int)abs(poblacion.size() - MIN_INDIVIDUOS_MUTACION)) + MIN_INDIVIDUOS_MUTACION ;
-	set<int> m = getNrandDistinct(mutating, poblacion.size());	
+	){	
+	int mutating = (mtrand() % poblacion.size()) + 1 ;	
+	set<int> m = getNrandDistinct(mutating, poblacion.size(), "m");	
 	char plant;
 	int pos_mutacion;
 
@@ -412,7 +427,7 @@ int main(){
 	while(g++ < MAX_GENERACIONES and !best.sobrevive){
 		ps = poblacion.size();
 		if(ps == 1){
-			cout<<"No ha sido posible conseguir una buena solucion, se presenta la combinacion encontrada con mejor heuristica encontrada."<<endl;
+			cout<<"No ha sido posible conseguir una buena solucion, se presenta la combinacion \ncon mejor heuristica encontrada en la ultima generacion."<<endl;
 			break;
 		}
 
@@ -422,7 +437,7 @@ int main(){
 			++i
 		){			
 			seleccion_torneo(
-				getNrandDistinct(INDIVIDUOS_POR_TORNEO, poblacion.size()),
+				getNrandDistinct(INDIVIDUOS_POR_TORNEO, poblacion.size(), "torneo"),
 				poblacion,
 				zv, w, h, z,
 				poblacion_clone		
@@ -436,11 +451,16 @@ int main(){
 
 		sort(poblacion.begin(), poblacion.end(), compara_aptitud);
 		best = poblacion[ poblacion.size() > 0 ? poblacion.size() -1 : 0 ];
+		
+		if(!best.sobrevive){
+			sort(poblacion.begin(), poblacion.end(), compara_aptitud_absolute);
+			best = poblacion[ poblacion.size() > 0 ? poblacion.size() -1 : 0 ];
+		}
 
-		/*cout<<"-- "<<poblacion.size()<<" --"<<endl;
+		cout<<"-- "<<poblacion.size()<<" --"<<endl;
 		for(int i =0;i<poblacion.size();++i){			
 			cout<<"Individuo ["<<i<<"] "<<poblacion[i].individuo<<" "<<poblacion[i].sobrevive<<" "<<poblacion[i].plantas<<" "<<poblacion[i].turnos<<" "<<(float)poblacion[i].plantas/poblacion[i].turnos<<endl;
-		}*/
+		}
 	}
 	printMatrix(best.individuo, w, MAX_COLUMNAS);
 	cout<<"Heuristica: "<<(float)best.plantas / best.turnos <<endl;
