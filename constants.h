@@ -8,7 +8,7 @@
 *
 */
 extern const int MAX_COLUMNAS = 4;
-extern const int MAX_VIDA_ZOMBIE = 9;
+extern const int MAX_VIDA_ZOMBIE = 8;
 extern const int MAX_VIDA_PLANTA = 1;
 extern const int MAX_PASO_ZOMBIE = 1;
 extern const int MAX_ELEMENT_TYPE = 4;

@@ -103,8 +103,8 @@ void loadEntry(
 		for (int i = 0; i < z && !f.eof(); ++i)
 		{			
 			f>>fila;
-			if(!fila){
-				cout<<"Zombie encontrado en fila invalida [0]"<<endl;
+			if(fila == 0 or fila > w){
+				cout<<"Zombie encontrado en fila invalida ["<<fila<<"]"<<endl;
 				exit(EXIT_FAILURE);
 			}
 			zombie_vector.push_back(Zombie(MAX_VIDA_ZOMBIE, fila-1, h-1));
@@ -159,8 +159,8 @@ char randPlant(){
 	return toSingleChar(v < 0 ? -1 * v : v);
 }
 
-vector<result_set> generarPoblacion(int h){	
-	int ml = h * MAX_COLUMNAS;
+vector<result_set> generarPoblacion(int w){	
+	int ml = w * MAX_COLUMNAS;
 	vector<result_set> v;
 	result_set r;
 	r.sobrevive = false;
@@ -229,7 +229,7 @@ result_set aptitud(string individuo, vector<Zombie> zv, int w, int h, int z){
 			int i = 0;
 			i < zv.size(); ++i
 		)
-			if (i <= turn){
+			if (i <= turn){				
 
 				if (zv[i].get_life()){
 					
@@ -284,7 +284,7 @@ result_set aptitud(string individuo, vector<Zombie> zv, int w, int h, int z){
 									individuo, 
 									zv[i].get_x(), 
 									zv[i].get_y(), 
-									w, 
+									MAX_COLUMNAS, 
 									(char)(((int)'0')+VACIO)
 								);								
 							}
@@ -304,7 +304,7 @@ result_set aptitud(string individuo, vector<Zombie> zv, int w, int h, int z){
 	}
 
 	result_set r;
-	r.sobrevive = (winner == 1);
+	r.sobrevive = (winner == 1); 
 	r.turnos = turn+1;
 	r.plantas = ps;
 	r.individuo = ind_res;
@@ -324,8 +324,7 @@ void seleccion_torneo(
 	result_set a_i;	
 	
 	for (it=individuos.begin(); it!=individuos.end(); ++it)
-	{
-		
+	{	
 		poblacion[*it] = aptitud((poblacion[*it]).individuo,zv, w, h, z);		
 
 		if ((float)poblacion[*it].plantas / poblacion[*it].turnos > max_aptitup)
@@ -333,15 +332,17 @@ void seleccion_torneo(
 			max_aptitup = (float)poblacion[*it].plantas / poblacion[*it].turnos;
 			pos_final = *it;
 		}
-	}	
+	}
+	
 	poblacion_nueva.push_back(poblacion[pos_final]);
-	poblacion.erase(poblacion.begin()+pos_final);	
+	poblacion.erase(poblacion.begin()+pos_final);
 }
 
 void cruce_clasico(
 	vector<result_set> &poblacion,
 	vector<Zombie> zv, int w, int h, int z
-	){ 
+	){
+
 	if(poblacion.size() > 1){
 		int crossing = 2 * ( ( mtrand() % (poblacion.size()/2)) + 1 );
 		set<int> m = getNrandDistinct(crossing, poblacion.size(), "cc");
@@ -398,7 +399,7 @@ void cruce_clasico(
 void mutacion_clasica(
 	vector<result_set> &poblacion,
 	vector<Zombie> zv, int w, int h, int z
-	){	
+	){
 	int mutating = (mtrand() % poblacion.size()) + 1 ;	
 	set<int> m = getNrandDistinct(mutating, poblacion.size(), "m");	
 	char plant;
