@@ -304,7 +304,7 @@ result_set aptitud(string individuo, vector<Zombie> zv, int w, int h, int z){
 	}
 
 	result_set r;
-	r.sobrevive = (winner == 1 ? true:false); 
+	r.sobrevive = (winner == 1);
 	r.turnos = turn+1;
 	r.plantas = ps;
 	r.individuo = ind_res;
