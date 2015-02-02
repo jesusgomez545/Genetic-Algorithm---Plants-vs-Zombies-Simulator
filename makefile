@@ -1,6 +1,7 @@
 
 CC = g++
 OPTS = -o
+COMPILER_OPTS = -c
 SRCS = $(wildcard *.cpp)
 AGENTNAME = pvz
 OBJS   = $(SRCS:%.cpp=%.o)
@@ -8,8 +9,8 @@ OBJS   = $(SRCS:%.cpp=%.o)
 all: clean compile
 
 %.o: %.cpp
-	@echo Making Object:	$< 
-	@$(CC) -c $<
+	@echo Making Object:	$< 	
+	@$(CC) $(COMPILER_OPTS) $<
 
 compile: $(OBJS)
 	@echo Linking Libraries
@@ -17,6 +18,9 @@ compile: $(OBJS)
 
 exe:
 	@./$(AGENTNAME)
+
+log:
+	@./$(AGENTNAME) > out.log
 
 clean:
 	@echo Cleaning
