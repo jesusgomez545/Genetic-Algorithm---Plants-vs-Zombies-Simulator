@@ -103,6 +103,10 @@ void loadEntry(
 		for (int i = 0; i < z && !f.eof(); ++i)
 		{			
 			f>>fila;
+			if(!fila){
+				cout<<"Zombie encontrado en fila invalida [0]"<<endl;
+				exit(EXIT_FAILURE);
+			}
 			zombie_vector.push_back(Zombie(MAX_VIDA_ZOMBIE, fila-1, h-1));
 		}
 		f.close();
@@ -174,7 +178,6 @@ vector<result_set> generarPoblacion(int h){
 
 
 set<int> getNrandDistinct(int n, int max, string caller){
-	
 
 	if ( n >= max ){
 		//cout << "(!) Se generaran todas las posiciones disponibles [0-"<<max-1<<"]"<<endl;
