@@ -74,7 +74,7 @@ bool compara_aptitud(result_set lhs, result_set rhs){
 bool compara_aptitud_absolute(result_set lhs, result_set rhs){ 
 	float ai_l = ((float)lhs.plantas / lhs.turnos);
 	float ai_r = ((float)rhs.plantas / rhs.turnos);
-	return  ai_r > ai_l;
+	return  ai_r < ai_l;
 }
 
 void loadEntry(
