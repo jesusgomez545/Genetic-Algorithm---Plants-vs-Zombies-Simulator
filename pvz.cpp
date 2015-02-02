@@ -230,6 +230,22 @@ result_set aptitud(string individuo, vector<Zombie> zv, int w, int h, int z){
 			i < zv.size(); ++i
 		)
 			if (i <= turn){
+
+				if (zv[i].get_life()){
+					
+					if(vector_impacto[zv[i].get_x()] < 0)
+						vector_impacto[zv[i].get_x()] = impactoFila(individuo, zv[i].get_x());					
+					
+					if ( zv[i].get_life() > vector_impacto[zv[i].get_x()]){
+						zv[i].set_life( zv[i].get_life() - vector_impacto[zv[i].get_x()] );
+						vector_impacto[zv[i].get_x()] = 0;
+					}else if ( zv[i].get_life() <= vector_impacto[zv[i].get_x()] ){
+						zv[i].set_life(0);
+						vector_impacto[zv[i].get_x()] = vector_impacto[zv[i].get_x()] - zv[i].get_life();
+						z = !z ? 0:z-1;
+					}
+				}
+
 				if (zv[i].get_life())
 					if(zv[i].get_y()){
 
@@ -276,21 +292,6 @@ result_set aptitud(string individuo, vector<Zombie> zv, int w, int h, int z){
 					}else{						
 						winner = -1;
 					}
-
-				if (zv[i].get_life()){
-					
-					if(vector_impacto[zv[i].get_x()] < 0)
-						vector_impacto[zv[i].get_x()] = impactoFila(individuo, zv[i].get_x());					
-					
-					if ( zv[i].get_life() > vector_impacto[zv[i].get_x()]){
-						zv[i].set_life( zv[i].get_life() - vector_impacto[zv[i].get_x()] );
-						vector_impacto[zv[i].get_x()] = 0;
-					}else if ( zv[i].get_life() <= vector_impacto[zv[i].get_x()] ){
-						zv[i].set_life(0);
-						vector_impacto[zv[i].get_x()] = vector_impacto[zv[i].get_x()] - zv[i].get_life();
-						z = !z ? 0:z-1;
-					}
-				}
 
 				if (!ps and !z)
 					winner = 0;
@@ -460,10 +461,10 @@ int main(){
 			best = poblacion[ poblacion.size() > 0 ? poblacion.size() -1 : 0 ];
 		}
 
-		cout<<"-- "<<poblacion.size()<<" --"<<endl;
+		/*cout<<"-- "<<poblacion.size()<<" --"<<endl;
 		for(int i =0;i<poblacion.size();++i){			
 			cout<<"Individuo ["<<i<<"] "<<poblacion[i].individuo<<" "<<poblacion[i].sobrevive<<" "<<poblacion[i].plantas<<" "<<poblacion[i].turnos<<" "<<(float)poblacion[i].plantas/poblacion[i].turnos<<endl;
-		}
+		}*/
 	}
 	printMatrix(best.individuo, w, MAX_COLUMNAS);
 	cout<<"Heuristica: "<<(float)best.plantas / best.turnos <<endl;
